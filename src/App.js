@@ -1,24 +1,32 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
+import HeaderPremise from './components/header_premis.jsx'
+import Borang from './components/borang.jsx'
+import { 
+  BrowserRouter as Router
+} from 'react-router-dom';
 
-function App() {
+const App = (props) => {
+  console.log(window.location.pathname)
+  let uuid = window.location.pathname.replace('/','')
+  const [premise, setPremise] = React.useState({})
+
+  React.useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API}/premise/${uuid}`)
+    .then(response => {
+      setPremise(response.data)
+    })
+  },[uuid])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+    <Router>
+     <HeaderPremise premise={premise} />
+      <hr />
+      <Borang premise={premise} />
+    </Router>
+     
     </div>
   );
 }
