@@ -20,9 +20,15 @@ const Borang = (props) => {
         }
     }, [])
 
-    let button_message = 'Bacaan suhu perlu'
+    let button_message = 'Lengkapkan Maklumat'
     let button_style = 'btn-outline-secondary'
     let disableSubmit = true
+
+    if ( formInput.nama_penuh.length > 4 && formInput.no_telefon.length >= 10) {
+        button_message = "Daftar Masuk"
+        button_style = 'btn-success'
+        disableSubmit = false
+    }
 
     if (typeof formInput.bacaan_suhu !== 'undefined') {
         if (formInput.bacaan_suhu.length > 3) {
@@ -86,7 +92,7 @@ const Borang = (props) => {
                     />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group d-none">
                     <label htmlFor="Bacaan Suhu">Bacaan Suhu</label>
                     <div className="input-group">
                         <input
