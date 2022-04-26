@@ -31,21 +31,16 @@ const Aktif = (props) => {
                 </center>
             </div>
 
-
             <div className="text-center mb-1" style={{ fontStyle: 'italic' }}>
                 "Pendaftaran anda telah berjaya, Sila simpan QRCode ini untuk rujukan dan pengesahan kami"
             </div>
-
-            <div className="mb-4">
             <div className="text-center">
-                <h3>Pendaftaran Direkod!</h3>
+                <h3>Maklumat Direkod!</h3>
             </div>
             
             <div className="text-center">
                 {moment().format('DD MMMM YYYY | hh:mm:ss A')}
             </div>
-            </div>
-            
         </div>
     )
 }

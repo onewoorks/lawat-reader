@@ -1,31 +1,15 @@
 import React from 'react'
 import axios from 'axios'
-import { v4 as uuidv4 } from 'uuid';
-import Aktif from '../components/Aktif.jsx'
+import Aktif from './Aktif.jsx'
 
 const Borang = (props) => {
-    let raw_path = window.location.pathname.replace('/', '')
-    let path = raw_path.split('/')
-    let kupon_code = path[2]
-    let cawangan = path[1]
-    const [kupon, setKupon] = React.useState({})
-
-    React.useEffect(() => {
-        axios
-            .get(`${process.env.REACT_APP_MIRTH_API}/kupon/${kupon_code}`)
-            .then((response) => {
-                setKupon(response.data)
-            })
-    }, [kupon_code, cawangan])
-    // let premise     = props.premise
-    // let cawangan    = props.cawangan
-    let code_verify = uuidv4()
+    let premise = props.premise
     const [displayForm, setDisplayForm] = React.useState(true)
     const [formInput, setFormInput] = React.useState({
         nama_penuh: '',
         no_telefon: '',
         tarikh_lahir: '',
-        email: ''
+        email: '',
     })
 
     React.useEffect(() => {
@@ -45,23 +29,40 @@ const Borang = (props) => {
         formInput.nama_penuh.length > 4 && 
         formInput.no_telefon.length >= 10 && 
         formInput.email.length >= 3 && formInput.tarikh_lahir.length >= 6) {
-        button_message = "Tuntut Boucer"
+        button_message = "Daftar Masuk"
         button_style = 'btn-success'
         disableSubmit = false
+    }
+
+    if (typeof formInput.bacaan_suhu !== 'undefined') {
+        
+        if (formInput.bacaan_suhu.length > 3) {
+            if (formInput.bacaan_suhu < 37.6) {
+                button_message = 'Daftar Masuk'
+                button_style = 'btn-success'
+                disableSubmit = false
+            }
+
+            if (formInput.bacaan_suhu > 37.5) {
+                button_message = 'Anda Berisiko'
+                button_style = 'btn-danger'
+                disableSubmit = true
+            }
+        }
     }
 
     const SubmitForm = (e) => {
         e.preventDefault()
         localStorage.removeItem('user_info')
+        console.log(formInput)
         let submit_data = {
             attendance_info: formInput,
-            cawangan: cawangan.cawangan,
-            // kupon: premise.code,
-            uuid: code_verify,
+            cawangan: premise.uuid,
+            kupon: 'new-customer'
         }
         localStorage.setItem('user_info', JSON.stringify(formInput))
         axios
-            .post(`${process.env.REACT_APP_MIRTH_API}/register`, submit_data)
+            .post(`${process.env.REACT_APP_MIRTH_API}/attendance`, submit_data)
             .then((response) => setDisplayForm(false))
     }
 
@@ -103,8 +104,8 @@ const Borang = (props) => {
                     <div className="input-group">
                         <input
                             type="date"
+                            step="0.1"
                             className="form-control text-center"
-                            value={formInput.tarikh_lahir}
                             onChange={(x) =>
                                 setFormInput({
                                     ...formInput,
@@ -121,7 +122,6 @@ const Borang = (props) => {
                         <input
                             type="email"
                             className="form-control text-center"
-                            value={formInput.email}
                             onChange={(x) =>
                                 setFormInput({
                                     ...formInput,
@@ -129,6 +129,26 @@ const Borang = (props) => {
                                 })
                             }
                         />
+                    </div>
+                </div>
+
+                <div className="form-group d-none">
+                    <label htmlFor="Bacaan Suhu">Bacaan Suhu</label>
+                    <div className="input-group">
+                        <input
+                            type="number"
+                            step="0.1"
+                            className="form-control text-center"
+                            onChange={(x) =>
+                                setFormInput({
+                                    ...formInput,
+                                    bacaan_suhu: x.target.value,
+                                })
+                            }
+                        />
+                        <div className="input-group-append">
+                            <span className="input-group-text">&deg; C</span>
+                        </div>
                     </div>
                 </div>
 
@@ -142,8 +162,8 @@ const Borang = (props) => {
                     {button_message}
                 </button>
             </form>
-            <div style={{display: (displayForm) ? 'none' : 'block'}}>
-                <Aktif codeverify={{ code_verify }}/>
+            <div style={{display: (displayForm) ? 'block' : 'block'}}>
+                <Aktif />
             </div>
         </div>
     )
